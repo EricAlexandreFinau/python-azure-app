@@ -1,11 +1,16 @@
 FROM python:3.10-slim
 
+# diretório de trabalho
 WORKDIR /app
 
+# copia os arquivos
 COPY . .
 
-RUN pip install -r requirements.txt
+# instala dependências
+RUN pip install --no-cache-dir -r requirements.txt
 
+# porta que o app usa
 EXPOSE 8000
 
-CMD gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 0
+# comando para subir aplicação
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000", "--workers", "1", "--threads", "8", "--timeout", "0"]
