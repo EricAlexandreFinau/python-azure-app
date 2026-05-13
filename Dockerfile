@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8000
 
-CMD gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 0
+CMD ["gunicorn", "--bind=0.0.0.0:8000", "--workers=1", "--threads=8", "--timeout=0", "--log-level=debug", "app:app"]
