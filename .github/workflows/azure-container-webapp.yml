@@ -73,11 +73,11 @@ jobs:
       
       - name: Build Docker
         run: |
-          docker build -t acraula123-bffcbtcrc7eef5fc.azurecr.io/minha-app:v1 .
+          docker build -t acraula123-bffcbtcrc7eef5fc.azurecr.io/minha-app:latest .
       
       - name: Push Docker
         run: |
-          docker push acraula123-bffcbtcrc7eef5fc.azurecr.io/minha-app:v1
+          docker push acraula123-bffcbtcrc7eef5fc.azurecr.io/minha-app:latest
 
 
   deploy:
