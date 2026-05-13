@@ -1,7 +1,7 @@
-from flask import Flask
+from flask import Flask, Response
 
 app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "AZURE OK FINAL 🚀"
+    return Response("OK AZURE", status=200)
