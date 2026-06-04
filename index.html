@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão da BookStore</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; max-width: 900px; margin: auto; background-color: #f4f7f6;}
+        .card { background: white; padding: 20px; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .form-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        input, select { padding: 10px; flex: 1; border: 1px solid #ccc; border-radius: 4px; min-width: 200px;}
+        button { padding: 10px 20px; background-color: #0078D4; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold;}
+        button:hover { background-color: #005A9E; }
+        .btn-danger { background-color: #dc3545; padding: 5px 10px; font-size: 12px;}
+        .btn-danger:hover { background-color: #c82333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border-bottom: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f8f9fa; }
+        h2 { border-bottom: 2px solid #0078D4; padding-bottom: 5px; color: #333;}
+    </style>
+</head>
+<body>
+
+    <h1>Gestão da BookStore</h1>
+
+    <h2>Autores</h2>
+    <div class="card">
+        <h3>Cadastrar Novo Autor</h3>
+        <div class="form-group">
+            <input type="text" id="nome_autor" placeholder="Nome do Autor" required>
+            <input type="text" id="nacionalidade" placeholder="Nacionalidade" required>
+            <input type="text" id="data_nascimento" placeholder="Data de Nascimento (Ex: 01/01/1990)" required>
+        </div>
+        <button onclick="adicionarAutor()">Salvar Autor</button>
+    </div>
+
+    <div class="card">
+        <h3>Lista de Autores</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Nacionalidade</th>
+                    <th>Nascimento</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-autores"></tbody>
+        </table>
+    </div>
+
+    <h2>Livros</h2>
+    <div class="card">
+        <h3>Cadastrar Novo Livro</h3>
+        <div class="form-group">
+            <input type="text" id="titulo" placeholder="Título do Livro" required>
+            <input type="number" id="ano_publicacao" placeholder="Ano de Publicação" required>
+            <input type="text" id="genero" placeholder="Gênero" required>
+            <select id="autor_id" required>
+                <option value="">Selecione um Autor...</option>
+                </select>
+        </div>
+        <button onclick="adicionarLivro()">Salvar Livro</button>
+    </div>
+
+    <div class="card">
+        <h3>Lista de Livros</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Ano</th>
+                    <th>Gênero</th>
+                    <th>ID Autor</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-livros"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // ⚠️ IMPORTANTE: Para testar na nuvem, mude o endereço abaixo para:
+        // const API_URL = "https://webapp-aula1238-bjaxh0e8e4e5b3ay.canadacentral-01.azurewebsites.net";
+        const API_URL = "http://127.0.0.1:8080"; // Configurado para a porta 8080
+
+        window.onload = () => {
+            carregarAutores();
+            carregarLivros();
+        };
+
+        // --- FUNÇÕES DE AUTOR ---
+        async function carregarAutores() {
+            try {
+                const resposta = await fetch(`${API_URL}/autores`);
+                const autores = await resposta.json();
+                
+                const tabela = document.getElementById('tabela-autores');
+                const selectAutor = document.getElementById('autor_id');
+                tabela.innerHTML = ''; 
+                selectAutor.innerHTML = '<option value="">Selecione um Autor...</option>';
+
+                autores.forEach(autor => {
+                    // Preenche a tabela
+                    tabela.innerHTML += `
+                        <tr>
+                            <td>${autor.id}</td>
+                            <td>${autor.nome_autor}</td>
+                            <td>${autor.nacionalidade}</td>
+                            <td>${autor.data_nascimento}</td>
+                            <td><button class="btn-danger" onclick="deletarAutor(${autor.id})">Deletar</button></td>
+                        </tr>
+                    `;
+                    // Preenche o dropdown do formulário de Livros
+                    selectAutor.innerHTML += `<option value="${autor.id}">${autor.nome_autor}</option>`;
+                });
+            } catch (error) {
+                console.error("Erro ao carregar autores:", error);
+            }
+        }
+
+        async function adicionarAutor() {
+            const nome_autor = document.getElementById('nome_autor').value;
+            const nacionalidade = document.getElementById('nacionalidade').value;
+            const data_nascimento = document.getElementById('data_nascimento').value;
+
+            if(!nome_autor || !nacionalidade || !data_nascimento) return alert("Preencha todos os campos do autor.");
+
+            try {
+                const resposta = await fetch(`${API_URL}/autores`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome_autor, nacionalidade, data_nascimento })
+                });
+
+                if (resposta.ok) {
+                    document.getElementById('nome_autor').value = '';
+                    document.getElementById('nacionalidade').value = '';
+                    document.getElementById('data_nascimento').value = '';
+                    carregarAutores(); 
+                } else {
+                    const erro = await resposta.json();
+                    alert("Erro: " + JSON.stringify(erro.detail));
+                }
+            } catch (error) { console.error("Erro ao salvar:", error); }
+        }
+
+        async function deletarAutor(id) {
+            if(confirm("Deseja deletar este autor?")) {
+                await fetch(`${API_URL}/autores/${id}`, { method: 'DELETE' });
+                carregarAutores(); 
+            }
+        }
+
+        // --- FUNÇÕES DE LIVRO ---
+        async function carregarLivros() {
+            try {
+                const resposta = await fetch(`${API_URL}/livros`);
+                const livros = await resposta.json();
+                
+                const tabela = document.getElementById('tabela-livros');
+                tabela.innerHTML = ''; 
+
+                livros.forEach(livro => {
+                    tabela.innerHTML += `
+                        <tr>
+                            <td>${livro.id}</td>
+                            <td>${livro.titulo}</td>
+                            <td>${livro.ano_publicacao}</td>
+                            <td>${livro.genero}</td>
+                            <td>${livro.autor_id}</td>
+                            <td><button class="btn-danger" onclick="deletarLivro(${livro.id})">Deletar</button></td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error("Erro ao carregar livros:", error);
+            }
+        }
+
+        async function adicionarLivro() {
+            const titulo = document.getElementById('titulo').value;
+            const ano_publicacao = parseInt(document.getElementById('ano_publicacao').value);
+            const genero = document.getElementById('genero').value;
+            const autor_id = parseInt(document.getElementById('autor_id').value);
+
+            if(!titulo || isNaN(ano_publicacao) || !genero || isNaN(autor_id)) return alert("Preencha todos os campos do livro.");
+
+            try {
+                const resposta = await fetch(`${API_URL}/livros`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ titulo, ano_publicacao, genero, autor_id })
+                });
+
+                if (resposta.ok) {
+                    document.getElementById('titulo').value = '';
+                    document.getElementById('ano_publicacao').value = '';
+                    document.getElementById('genero').value = '';
+                    document.getElementById('autor_id').value = '';
+                    carregarLivros(); 
+                } else {
+                    const erro = await resposta.json();
+                    alert("Erro: " + JSON.stringify(erro.detail));
+                }
+            } catch (error) { console.error("Erro ao salvar livro:", error); }
+        }
+
+        async function deletarLivro(id) {
+            if(confirm("Deseja deletar este livro?")) {
+                await fetch(`${API_URL}/livros/${id}`, { method: 'DELETE' });
+                carregarLivros(); 
+            }
+        }
+    </script>
+</body>
+</html>
