@@ -82,9 +82,8 @@
     </div>
 
     <script>
-        // ⚠️ IMPORTANTE: Para testar na nuvem, mude o endereço abaixo para:
-        // const API_URL = "https://webapp-aula1238-bjaxh0e8e4e5b3ay.canadacentral-01.azurewebsites.net";
-        const API_URL = "http://127.0.0.1:8080"; // Configurado para a porta 8080
+        // O Front-End agora está apontando diretamente para a sua API no Azure!
+        const API_URL = "https://webapp-aula1238-bjaxh0e8e4e5b3ay.canadacentral-01.azurewebsites.net";
 
         window.onload = () => {
             carregarAutores();
@@ -103,7 +102,6 @@
                 selectAutor.innerHTML = '<option value="">Selecione um Autor...</option>';
 
                 autores.forEach(autor => {
-                    // Preenche a tabela
                     tabela.innerHTML += `
                         <tr>
                             <td>${autor.id}</td>
@@ -113,7 +111,6 @@
                             <td><button class="btn-danger" onclick="deletarAutor(${autor.id})">Deletar</button></td>
                         </tr>
                     `;
-                    // Preenche o dropdown do formulário de Livros
                     selectAutor.innerHTML += `<option value="${autor.id}">${autor.nome_autor}</option>`;
                 });
             } catch (error) {
