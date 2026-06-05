@@ -7,10 +7,7 @@ from typing import Optional, List
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 
-# ==========================================
-# 1. CONFIGURAÇÃO DO BANCO DE DADOS (Azure)
-# ==========================================
-# O sistema procura a sua variável DB_URL lá do painel do Azure
+
 DATABASE_URL = os.environ.get("DB_URL", "sqlite:///./banco_teste.db")
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
@@ -19,9 +16,7 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# ==========================================
-# 2. MODELOS DAS TABELAS (Substitui o DAO)
-# ==========================================
+
 class AutorModel(Base):
     __tablename__ = "autores"
     id = Column(Integer, primary_key=True, index=True)
@@ -37,12 +32,9 @@ class LivroModel(Base):
     genero = Column(String)
     autor_id = Column(Integer, ForeignKey("autores.id"))
 
-# Cria as tabelas automaticamente no Azure se não existirem
 Base.metadata.create_all(bind=engine)
 
-# ==========================================
-# 3. SCHEMAS (Validação)
-# ==========================================
+
 class AutorSchema(BaseModel): 
     nome_autor: str
     nacionalidade: str
@@ -54,9 +46,7 @@ class LivroSchema(BaseModel):
     genero: str
     autor_id: int
 
-# ==========================================
-# 4. INICIALIZAÇÃO DA API
-# ==========================================
+
 app = FastAPI(title="BookStore API - Simplificada")
 
 app.add_middleware(
@@ -67,7 +57,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Gerenciador de conexão para não sobrecarregar o banco
+
 def get_db():
     db = SessionLocal()
     try:
@@ -75,9 +65,7 @@ def get_db():
     finally:
         db.close()
 
-# ==========================================
-# 5. ROTAS DE AUTORES
-# ==========================================
+
 @app.post("/autores", status_code=201)
 def adicionar_autor(autor: AutorSchema, db: Session = Depends(get_db)):
     novo_autor = AutorModel(**autor.model_dump())
@@ -120,9 +108,7 @@ def deletar_autor(autor_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"mensagem": f"Autor {autor_id} deletado com sucesso da base de dados"}
 
-# ==========================================
-# 6. ROTAS DE LIVROS
-# ==========================================
+
 @app.post("/livros", status_code=201)
 def adicionar_livro(livro: LivroSchema, db: Session = Depends(get_db)):
     autor_existe = db.query(AutorModel).filter(AutorModel.id == livro.autor_id).first()
