@@ -82,7 +82,6 @@
     </div>
 
     <script>
-        // O Front-End agora está apontando diretamente para a sua API no Azure!
         const API_URL = "https://webapp-aula1238-bjaxh0e8e4e5b3ay.canadacentral-01.azurewebsites.net";
 
         window.onload = () => {
@@ -90,7 +89,7 @@
             carregarLivros();
         };
 
-        // --- FUNÇÕES DE AUTOR ---
+        
         async function carregarAutores() {
             try {
                 const resposta = await fetch(`${API_URL}/autores`);
@@ -151,7 +150,7 @@
             }
         }
 
-        // --- FUNÇÕES DE LIVRO ---
+       
         async function carregarLivros() {
             try {
                 const resposta = await fetch(`${API_URL}/livros`);
