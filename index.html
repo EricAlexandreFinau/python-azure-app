@@ -3,35 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão da BookStore</title>
+    <title>Painel Gestor - BookStore</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; max-width: 900px; margin: auto; background-color: #f4f7f6;}
-        .card { background: white; padding: 20px; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .form-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
-        input, select { padding: 10px; flex: 1; border: 1px solid #ccc; border-radius: 4px; min-width: 200px;}
-        button { padding: 10px 20px; background-color: #0078D4; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold;}
-        button:hover { background-color: #005A9E; }
-        .btn-danger { background-color: #dc3545; padding: 5px 10px; font-size: 12px;}
-        .btn-danger:hover { background-color: #c82333; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border-bottom: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: #f8f9fa; }
-        h2 { border-bottom: 2px solid #0078D4; padding-bottom: 5px; color: #333;}
+        :root {
+            --primary: #0078D4;
+            --primary-hover: #005A9E;
+            --danger: #dc3545;
+            --danger-hover: #c82333;
+            --warning: #ffc107;
+            --warning-hover: #e0a800;
+            --bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --text: #333333;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding: 20px; 
+            max-width: 1000px; 
+            margin: auto; 
+            background-color: var(--bg);
+            color: var(--text);
+        }
+
+        h1 { text-align: center; color: var(--primary); margin-bottom: 30px; }
+        h2 { border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-top: 40px;}
+        
+        .card { 
+            background: var(--card-bg); 
+            padding: 25px; 
+            margin-bottom: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        input, select { 
+            padding: 12px; 
+            border: 1px solid #d1d5db; 
+            border-radius: 6px; 
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.2);
+        }
+
+        .btn-group { display: flex; gap: 10px; }
+
+        button { 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 6px; 
+            font-weight: 600;
+            cursor: pointer; 
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        
+        .btn-warning { background-color: var(--warning); color: #212529; padding: 8px 12px; font-size: 13px;}
+        .btn-warning:hover { background-color: var(--warning-hover); }
+
+        .btn-danger { background-color: var(--danger); color: white; padding: 8px 12px; font-size: 13px;}
+        .btn-danger:hover { background-color: var(--danger-hover); }
+
+        .btn-cancel { background-color: #6c757d; color: white; display: none; }
+        .btn-cancel:hover { background-color: #5a6268; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { border-bottom: 1px solid #e5e7eb; padding: 15px 10px; text-align: left; }
+        th { background-color: #f8f9fa; font-weight: 600; color: #4b5563;}
+        tr:hover { background-color: #f9fafb; }
+        
+        .actions { display: flex; gap: 8px; }
     </style>
 </head>
 <body>
 
-    <h1>Gestão da BookStore</h1>
+    <h1>📚 Painel Gestor - BookStore</h1>
 
-    <h2>Autores</h2>
+    <h2>Gestão de Autores</h2>
     <div class="card">
-        <h3>Cadastrar Novo Autor</h3>
-        <div class="form-group">
+        <h3 id="titulo-form-autor">Cadastrar Novo Autor</h3>
+        <div class="form-grid">
             <input type="text" id="nome_autor" placeholder="Nome do Autor" required>
             <input type="text" id="nacionalidade" placeholder="Nacionalidade" required>
             <input type="text" id="data_nascimento" placeholder="Data de Nascimento (Ex: 01/01/1990)" required>
         </div>
-        <button onclick="adicionarAutor()">Salvar Autor</button>
+        <div class="btn-group">
+            <button class="btn-primary" id="btn-salvar-autor" onclick="salvarAutor()">Salvar Autor</button>
+            <button class="btn-cancel" id="btn-cancelar-autor" onclick="cancelarEdicaoAutor()">Cancelar Edição</button>
+        </div>
     </div>
 
     <div class="card">
@@ -50,10 +124,10 @@
         </table>
     </div>
 
-    <h2>Livros</h2>
+    <h2>Gestão de Livros</h2>
     <div class="card">
-        <h3>Cadastrar Novo Livro</h3>
-        <div class="form-group">
+        <h3 id="titulo-form-livro">Cadastrar Novo Livro</h3>
+        <div class="form-grid">
             <input type="text" id="titulo" placeholder="Título do Livro" required>
             <input type="number" id="ano_publicacao" placeholder="Ano de Publicação" required>
             <input type="text" id="genero" placeholder="Gênero" required>
@@ -61,7 +135,10 @@
                 <option value="">Selecione um Autor...</option>
                 </select>
         </div>
-        <button onclick="adicionarLivro()">Salvar Livro</button>
+        <div class="btn-group">
+            <button class="btn-primary" id="btn-salvar-livro" onclick="salvarLivro()">Salvar Livro</button>
+            <button class="btn-cancel" id="btn-cancelar-livro" onclick="cancelarEdicaoLivro()">Cancelar Edição</button>
+        </div>
     </div>
 
     <div class="card">
@@ -81,14 +158,16 @@
         </table>
     </div>
 
-    <script>
+    <script>        
         const API_URL = "https://webapp-aula1238-bjaxh0e8e4e5b3ay.canadacentral-01.azurewebsites.net";
+        
+        let idAutorEditando = null;
+        let idLivroEditando = null;
 
         window.onload = () => {
             carregarAutores();
             carregarLivros();
         };
-
         
         async function carregarAutores() {
             try {
@@ -97,6 +176,7 @@
                 
                 const tabela = document.getElementById('tabela-autores');
                 const selectAutor = document.getElementById('autor_id');
+                
                 tabela.innerHTML = ''; 
                 selectAutor.innerHTML = '<option value="">Selecione um Autor...</option>';
 
@@ -107,35 +187,42 @@
                             <td>${autor.nome_autor}</td>
                             <td>${autor.nacionalidade}</td>
                             <td>${autor.data_nascimento}</td>
-                            <td><button class="btn-danger" onclick="deletarAutor(${autor.id})">Deletar</button></td>
+                            <td class="actions">
+                                <button class="btn-warning" onclick="prepararEdicaoAutor(${autor.id}, '${autor.nome_autor}', '${autor.nacionalidade}', '${autor.data_nascimento}')">Editar</button>
+                                <button class="btn-danger" onclick="excluirAutor(${autor.id})">Deletar</button>
+                            </td>
                         </tr>
                     `;
                     selectAutor.innerHTML += `<option value="${autor.id}">${autor.nome_autor}</option>`;
                 });
-            } catch (error) {
-                console.error("Erro ao carregar autores:", error);
-            }
+            } catch (error) { console.error("Erro ao carregar autores:", error); }
         }
 
-        async function adicionarAutor() {
+        async function salvarAutor() {
             const nome_autor = document.getElementById('nome_autor').value;
             const nacionalidade = document.getElementById('nacionalidade').value;
             const data_nascimento = document.getElementById('data_nascimento').value;
 
             if(!nome_autor || !nacionalidade || !data_nascimento) return alert("Preencha todos os campos do autor.");
 
+            const payload = { nome_autor, nacionalidade, data_nascimento };
+            
+            
+            const metodo = idAutorEditando ? 'PUT' : 'POST';
+            const url = idAutorEditando ? `${API_URL}/autores/${idAutorEditando}` : `${API_URL}/autores`;
+
             try {
-                const resposta = await fetch(`${API_URL}/autores`, {
-                    method: 'POST',
+                const resposta = await fetch(url, {
+                    method: metodo,
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nome_autor, nacionalidade, data_nascimento })
+                    body: JSON.stringify(payload)
                 });
 
                 if (resposta.ok) {
-                    document.getElementById('nome_autor').value = '';
-                    document.getElementById('nacionalidade').value = '';
-                    document.getElementById('data_nascimento').value = '';
-                    carregarAutores(); 
+                    cancelarEdicaoAutor();
+                    carregarAutores();
+                    
+                    carregarLivros(); 
                 } else {
                     const erro = await resposta.json();
                     alert("Erro: " + JSON.stringify(erro.detail));
@@ -143,14 +230,36 @@
             } catch (error) { console.error("Erro ao salvar:", error); }
         }
 
-        async function deletarAutor(id) {
-            if(confirm("Deseja deletar este autor?")) {
+        function prepararEdicaoAutor(id, nome, nac, nasc) {
+            idAutorEditando = id;
+            document.getElementById('nome_autor').value = nome;
+            document.getElementById('nacionalidade').value = nac;
+            document.getElementById('data_nascimento').value = nasc;
+            
+            document.getElementById('titulo-form-autor').innerText = `Editando Autor #${id}`;
+            document.getElementById('btn-salvar-autor').innerText = "Atualizar Autor";
+            document.getElementById('btn-cancelar-autor').style.display = "block";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelarEdicaoAutor() {
+            idAutorEditando = null;
+            document.getElementById('nome_autor').value = '';
+            document.getElementById('nacionalidade').value = '';
+            document.getElementById('data_nascimento').value = '';
+            
+            document.getElementById('titulo-form-autor').innerText = "Cadastrar Novo Autor";
+            document.getElementById('btn-salvar-autor').innerText = "Salvar Autor";
+            document.getElementById('btn-cancelar-autor').style.display = "none";
+        }
+
+        async function excluirAutor(id) {
+            if(confirm(`Atenção: Tem certeza que deseja deletar o autor #${id}? Se ele tiver livros vinculados, pode haver erro de integridade.`)) {
                 await fetch(`${API_URL}/autores/${id}`, { method: 'DELETE' });
                 carregarAutores(); 
             }
         }
-
-       
+        
         async function carregarLivros() {
             try {
                 const resposta = await fetch(`${API_URL}/livros`);
@@ -163,39 +272,42 @@
                     tabela.innerHTML += `
                         <tr>
                             <td>${livro.id}</td>
-                            <td>${livro.titulo}</td>
+                            <td><strong>${livro.titulo}</strong></td>
                             <td>${livro.ano_publicacao}</td>
                             <td>${livro.genero}</td>
                             <td>${livro.autor_id}</td>
-                            <td><button class="btn-danger" onclick="deletarLivro(${livro.id})">Deletar</button></td>
+                            <td class="actions">
+                                <button class="btn-warning" onclick="prepararEdicaoLivro(${livro.id}, '${livro.titulo}', ${livro.ano_publicacao}, '${livro.genero}', ${livro.autor_id})">Editar</button>
+                                <button class="btn-danger" onclick="excluirLivro(${livro.id})">Deletar</button>
+                            </td>
                         </tr>
                     `;
                 });
-            } catch (error) {
-                console.error("Erro ao carregar livros:", error);
-            }
+            } catch (error) { console.error("Erro ao carregar livros:", error); }
         }
 
-        async function adicionarLivro() {
+        async function salvarLivro() {
             const titulo = document.getElementById('titulo').value;
             const ano_publicacao = parseInt(document.getElementById('ano_publicacao').value);
             const genero = document.getElementById('genero').value;
             const autor_id = parseInt(document.getElementById('autor_id').value);
 
-            if(!titulo || isNaN(ano_publicacao) || !genero || isNaN(autor_id)) return alert("Preencha todos os campos do livro.");
+            if(!titulo || isNaN(ano_publicacao) || !genero || isNaN(autor_id)) return alert("Preencha todos os campos do livro corretamente.");
+
+            const payload = { titulo, ano_publicacao, genero, autor_id };
+            
+            const metodo = idLivroEditando ? 'PUT' : 'POST';
+            const url = idLivroEditando ? `${API_URL}/livros/${idLivroEditando}` : `${API_URL}/livros`;
 
             try {
-                const resposta = await fetch(`${API_URL}/livros`, {
-                    method: 'POST',
+                const resposta = await fetch(url, {
+                    method: metodo,
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ titulo, ano_publicacao, genero, autor_id })
+                    body: JSON.stringify(payload)
                 });
 
                 if (resposta.ok) {
-                    document.getElementById('titulo').value = '';
-                    document.getElementById('ano_publicacao').value = '';
-                    document.getElementById('genero').value = '';
-                    document.getElementById('autor_id').value = '';
+                    cancelarEdicaoLivro();
                     carregarLivros(); 
                 } else {
                     const erro = await resposta.json();
@@ -204,8 +316,32 @@
             } catch (error) { console.error("Erro ao salvar livro:", error); }
         }
 
-        async function deletarLivro(id) {
-            if(confirm("Deseja deletar este livro?")) {
+        function prepararEdicaoLivro(id, tit, ano, gen, aut_id) {
+            idLivroEditando = id;
+            document.getElementById('titulo').value = tit;
+            document.getElementById('ano_publicacao').value = ano;
+            document.getElementById('genero').value = gen;
+            document.getElementById('autor_id').value = aut_id;
+            
+            document.getElementById('titulo-form-livro').innerText = `Editando Livro #${id}`;
+            document.getElementById('btn-salvar-livro').innerText = "Atualizar Livro";
+            document.getElementById('btn-cancelar-livro').style.display = "block";
+        }
+
+        function cancelarEdicaoLivro() {
+            idLivroEditando = null;
+            document.getElementById('titulo').value = '';
+            document.getElementById('ano_publicacao').value = '';
+            document.getElementById('genero').value = '';
+            document.getElementById('autor_id').value = '';
+            
+            document.getElementById('titulo-form-livro').innerText = "Cadastrar Novo Livro";
+            document.getElementById('btn-salvar-livro').innerText = "Salvar Livro";
+            document.getElementById('btn-cancelar-livro').style.display = "none";
+        }
+
+        async function excluirLivro(id) {
+            if(confirm(`Tem certeza que deseja deletar o livro #${id}?`)) {
                 await fetch(`${API_URL}/livros/${id}`, { method: 'DELETE' });
                 carregarLivros(); 
             }
